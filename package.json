@@ -1,0 +1,47 @@
+{
+    "name": "conifer",
+    "version": "0.1.0",
+    "description": "A multi-format, file-based configuration library for Node.",
+    "keywords": [
+        "config",
+        "configuration",
+        "cson",
+        "json"
+    ],
+
+    "homepage": "https://github.com/rowanmanning/conifer",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/rowanmanning/conifer.git"
+    },
+    "bugs": "https://github.com/rowanmanning/conifer/issues",
+
+    "author": {
+        "name": "Rowan Manning",
+        "url": "http://rowanmanning.co.uk/"
+    },
+
+    "dependencies": {
+        "cson": "1.2.x",
+        "er": "0.2.x"
+    },
+    "devDependencies": {
+        "chai": "1.1.x",
+        "coffee-script": "1.3.x",
+        "coffeelint": "0.4.x",
+        "colors": "0.6.0-1",
+        "mocha": "1.2.x",
+        "sinon": "1.3.x"
+    },
+
+    "main": "./lib/conifer",
+
+    "scripts": {
+        "prepublish": "jake build",
+        "test": "jake test"
+    },
+
+    "engines": {
+        "node": ">=0.6.0"
+    }
+}
