@@ -3,7 +3,7 @@ Conifer
 =======
 
 A multi-format, file-based configuration library for Node. It
-stream-lines reading and parsing configurations from JSON or
+streamlines reading and parsing configurations from JSON or
 CSON files, with support for adding your own file-type handlers.
 
 This project is simple right now, but there are some fun
@@ -79,7 +79,7 @@ configuration to get, and returns the requested configuration
 
 ```js
 var config = new conifer.Store({foo: 'bar'});
-var foo = config.get('foo'); // bar
+config.get('foo'); // bar
 ```
 
 #### set method
@@ -90,7 +90,62 @@ configuration to set and the value to set it to.
 ```js
 var config = new conifer.Store({});
 config.set('foo', 'bar');
-var foo = config.get('foo'); // bar
+config.get('foo'); // bar
+```
+
+
+Extending With File Handlers
+----------------------------
+
+Conifer can be extended to work with almost any configuration
+format. It's just a case of writing a file handler. The file
+handler API is extremely simple:
+
+### conifer.setFileHandler
+
+This function adds a new file handler. It accepts two arguments
+– a file extension and a handler function. The handler function
+should accept a content string and return a successfully parsed
+object or throw an error.
+
+```js
+conifer.setFileHandler('xml', function (fileContent) {
+    try {
+        return myMagicXmlLib.parse(fileContent);
+    } catch (error) {
+        throw error;
+    }
+});
+```
+
+With the above code, any call to
+[`conifer.parse`](#coniferparse) or
+[`conifer.parseSync`](#coniferparsesync) with a file path that
+has a `.xml` extension will use the specified handler function
+to parse the file content.
+
+---
+
+### conifer.getFileHandler
+
+This function gets a file handler that's been set already. This
+function accepts a single argument – the file extension to get
+the handler for, and returns the requested function.
+
+```js
+conifer.getFileHandler('json'); // [Function]
+```
+
+---
+
+### conifer.removeFileHandler
+
+This function removes a file handler that's been set already. This function accepts a single argument – the file extension to
+get the handler for.
+
+```js
+conifer.removeFileHandler('json');
+conifer.getFileHandler('json'); // undefined
 ```
 
 
