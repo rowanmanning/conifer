@@ -39,7 +39,7 @@
 
     "scripts": {
         "prepublish": "./node_modules/.bin/jake -f ./jakefile.coffee build",
-        "test": "./node_modules/.bin/jake -f ./jakefile.coffee lint test"
+        "test": "./node_modules/.bin/jake -f ./jakefile.coffee test"
     },
 
     "engines": {
