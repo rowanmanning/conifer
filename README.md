@@ -9,6 +9,8 @@ CSON files, with support for adding your own file-type handlers.
 This project is simple right now, but there are some fun
 features planned for a [future release][roadmap].
 
+[![Build Status][travis-status]][travis]
+
 
 Basic Usage
 -----------
@@ -182,3 +184,5 @@ licenses.
 [gpl]: http://opensource.org/licenses/gpl-2.0.php
 [mit]: http://opensource.org/licenses/mit-license.php
 [roadmap]: https://github.com/rowanmanning/conifer/blob/master/ROADMAP.md
+[travis]: https://secure.travis-ci.org/rowanmanning/pledge.png?branch=master
+[travis-status]: https://secure.travis-ci.org/rowanmanning/pledge.png?branch=master
