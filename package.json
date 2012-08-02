@@ -30,6 +30,7 @@
         "coffee-script": "1.3.x",
         "coffeelint": "0.4.x",
         "colors": "0.6.0-1",
+        "jake": "0.3.x",
         "mocha": "1.2.x",
         "sinon": "1.3.x"
     },
@@ -37,8 +38,8 @@
     "main": "./lib/conifer",
 
     "scripts": {
-        "prepublish": "jake build",
-        "test": "jake test"
+        "prepublish": "./node_modules/.bin/jake -f ./jakefile.coffee build",
+        "test": "./node_modules/.bin/jake -f ./jakefile.coffee lint test"
     },
 
     "engines": {
