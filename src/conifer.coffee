@@ -3,9 +3,9 @@
 CSON = require 'cson'
 {ArgumentError, ArgumentMissingError, ArgumentTypeError, FileNotFoundError} = require 'er'
 fs = require 'fs'
-path = require 'path'
 {Store} = require './store'
-{verifyArg} = require './util'
+util = require './util'
+verifyArg = util.verifyArg
 
 
 # Set up exports
@@ -63,7 +63,7 @@ conifer.parse = (filePath, callback) ->
     if err? or not stats.isFile()
       callback null, new FileNotFoundError "Config file at #{filePath} was not found, or is not a file"
     else
-      fileExtension = util.getFileExtension filePath
+      fileExtension = util.path.getFileExtension filePath
       fileHandler = conifer.getFileHandler fileExtension
       if not fileHandler?
         callback null, new conifer.HandlerNotFoundError "Handler for '#{fileExtension}' was not found"
@@ -85,7 +85,7 @@ conifer.parseSync = (filePath) ->
     throw new Error() if not stats.isFile()
   catch error
     throw fileError
-  fileExtension = util.getFileExtension filePath
+  fileExtension = util.path.getFileExtension filePath
   fileHandler = conifer.getFileHandler fileExtension
   if not fileHandler?
     throw new conifer.HandlerNotFoundError "Handler for '#{fileExtension}' was not found"
@@ -93,11 +93,3 @@ conifer.parseSync = (filePath) ->
   data = fs.readFileSync filePath, 'utf8'
   parsedData = fileHandler data
   new conifer.Store(parsedData)
-
-
-# Utilities
-util =
-
-  # Get the file extension part of a filePath
-  getFileExtension: (filePath) ->
-    path.extname(filePath).replace /^\./, ''

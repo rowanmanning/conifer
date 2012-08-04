@@ -1,6 +1,7 @@
 
 # Dependencies
 {ArgumentError, ArgumentMissingError, ArgumentTypeError, BadConstructionError} = require 'er'
+path = require 'path'
 
 
 # Argument verification
@@ -32,3 +33,11 @@ exports.verifyArg =
 exports.verifyConstruction = (instance, constructor) ->
   if instance not instanceof constructor
     throw new BadConstructionError
+
+
+# Path utilities
+exports.path =
+
+  getFileExtension: (filePath) ->
+    exports.verifyArg.isString 'filePath', filePath
+    path.extname(filePath).replace /^\./, ''

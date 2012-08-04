@@ -18,6 +18,9 @@ suite 'util module', ->
 
   test 'should have a `verifyConstruction` function', ->
     assert.isFunction util.verifyConstruction
+
+  test 'should have a `path` namespace', ->
+    assert.isObject util.path
   
 
   suite '`verifyArg` namespace', ->
@@ -120,3 +123,32 @@ suite 'util module', ->
       assert.throws ->
         util.verifyConstruction {}, Date
       , BadConstructionError
+
+
+  suite '`path` namespace', ->
+    path = util.path
+
+    test 'should have a `getFileExtension` function', ->
+      assert.isFunction path.getFileExtension
+
+
+    suite '`getFileExtension` function', ->
+
+      test 'should not throw when called with a string filePath argument', ->
+        assert.doesNotThrow ->
+          path.getFileExtension 'foo'
+
+      test 'should throw when called with a non-string filePath argument', ->
+        assert.throws ->
+          path.getFileExtension {}
+        , ArgumentTypeError
+
+      test 'should return a string', ->
+        assert.isString path.getFileExtension('foo')
+
+      test 'should return the expected file extension with no leading period', ->
+        assert.strictEqual path.getFileExtension('foo'), ''
+        assert.strictEqual path.getFileExtension('hello.html'), 'html'
+        assert.strictEqual path.getFileExtension('hello..html'), 'html'
+        assert.strictEqual path.getFileExtension('hello.html.mustache'), 'mustache'
+        assert.strictEqual path.getFileExtension('path/to/hello.html'), 'html'
