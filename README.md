@@ -3,8 +3,9 @@ Conifer
 =======
 
 A multi-format, file-based configuration library for Node. It
-streamlines reading and parsing configurations from JSON or
-CSON files, with support for adding your own file-type handlers.
+streamlines reading and parsing configurations from
+[JSON][json], [CSON][cson] and [YAML][yaml] files, with support
+for adding your own file-type handlers.
 
 This project is simple right now, but there are some fun
 features planned for a [future release][roadmap].
@@ -182,8 +183,11 @@ Dual licensed under the [MIT][mit] or [GPL Version 2][gpl]
 licenses.
 
 
+[cson]: https://github.com/bevry/cson
 [gpl]: http://opensource.org/licenses/gpl-2.0.php
+[json]: http://www.json.org/
 [mit]: http://opensource.org/licenses/mit-license.php
 [roadmap]: https://github.com/rowanmanning/conifer/blob/master/ROADMAP.md
 [travis]: https://secure.travis-ci.org/rowanmanning/pledge.png?branch=master
 [travis-status]: https://secure.travis-ci.org/rowanmanning/pledge.png?branch=master
+[yaml]: http://www.yaml.org/

@@ -2,6 +2,7 @@
 # Dependencies
 CSON = require 'cson'
 {verifyArg} = require './util'
+yaml = require 'js-yaml'
 
 
 # File handler storage (and defaults)
@@ -21,6 +22,14 @@ handlers =
     if fileContent is ''
       return undefined
     JSON.parse fileContent
+
+  # 'yml' file handler
+  yml: (fileContent) ->
+    verifyArg.isString 'fileContent', fileContent
+    try
+      yaml.load fileContent
+    catch error
+      throw new SyntaxError error.toString()
 
 
 # Remove a file handler

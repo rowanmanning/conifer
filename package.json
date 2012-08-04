@@ -6,7 +6,8 @@
         "config",
         "configuration",
         "cson",
-        "json"
+        "json",
+        "yaml"
     ],
 
     "homepage": "https://github.com/rowanmanning/conifer",
@@ -23,7 +24,8 @@
 
     "dependencies": {
         "cson": "1.2.x",
-        "er": "0.2.x"
+        "er": "0.2.x",
+        "js-yaml": "1.0.x"
     },
     "devDependencies": {
         "chai": "1.1.x",

@@ -166,6 +166,9 @@ suite 'handler module', ->
     test '\'json\' handler should be registered', ->
       assert.isFunction handler.getHandler('json')
 
+    test '\'yml\' handler should be registered', ->
+      assert.isFunction handler.getHandler('yml')
+
 
     suite '\'cson\' handler', ->
       csonHandler = handler.getHandler 'cson'
@@ -215,3 +218,33 @@ suite 'handler module', ->
 
       test 'should return the expected parsed object when called with a valid JSON string', ->
         assert.deepEqual jsonHandler('{"foo": "bar", "bar": true}'), {foo: 'bar', bar: true}
+
+
+    suite '\'yml\' handler', ->
+      ymlHandler = handler.getHandler 'yml'
+
+      test 'should not throw when called with valid arguments', ->
+        assert.doesNotThrow ->
+          ymlHandler '''
+            foo: bar
+          '''
+
+      test 'should throw when called with a non-string `fileContent` argument', ->
+        assert.throws ->
+          ymlHandler {}
+        , ArgumentTypeError
+
+      test 'should not throw when called with an empty string `fileContent` argument', ->
+        assert.doesNotThrow ->
+          ymlHandler ''
+
+      test 'should throw when called with an invalid YAML string `fileContent` argument', ->
+        assert.throws ->
+          ymlHandler '{%%%:}'
+        , SyntaxError
+
+      test 'should return the expected parsed object when called with a valid YAML string', ->
+        assert.deepEqual ymlHandler('''
+          foo: 'bar'
+          bar: true
+        '''), {foo: 'bar', bar: true}
