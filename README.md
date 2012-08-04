@@ -13,6 +13,19 @@ features planned for a [future release][roadmap].
 [![Build Status][travis-status]][travis]
 
 
+Installing
+----------
+
+Install Conifer through `npm`. Either with the command:
+
+```sh
+npm install conifer
+```
+
+or by adding `conifer` to the dependencies in your project
+`package.json`.
+
+
 Basic Usage
 -----------
 
