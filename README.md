@@ -100,18 +100,18 @@ Extending With File Handlers
 ----------------------------
 
 Conifer can be extended to work with almost any configuration
-format. It's just a case of writing a file handler. The file
-handler API is extremely simple:
+format. It's just a case of writing a handler for that file
+type. The handler API is extremely simple:
 
-### conifer.setFileHandler
+### conifer.handler.setHandler
 
-This function adds a new file handler. It accepts two arguments
-– a file extension and a handler function. The handler function
+This function adds a new handler. It accepts two arguments – a
+file extension and a handler function. The handler function
 should accept a content string and return a successfully parsed
 object or throw an error.
 
 ```js
-conifer.setFileHandler('xml', function (fileContent) {
+conifer.handler.setHandler('xml', function (fileContent) {
     try {
         return myMagicXmlLib.parse(fileContent);
     } catch (error) {
@@ -128,26 +128,27 @@ to parse the file content.
 
 ---
 
-### conifer.getFileHandler
+### conifer.handler.getHandler
 
-This function gets a file handler that's been set already. This
+This function gets a handler that's been set already. This
 function accepts a single argument – the file extension to get
 the handler for, and returns the requested function.
 
 ```js
-conifer.getFileHandler('json'); // [Function]
+conifer.handler.getHandler('json'); // [Function]
 ```
 
 ---
 
-### conifer.removeFileHandler
+### conifer.handler.removeHandler
 
-This function removes a file handler that's been set already. This function accepts a single argument – the file extension to
-get the handler for.
+This function removes a handler that's been set already. This
+function accepts a single argument – the file extension to get
+the handler for.
 
 ```js
-conifer.removeFileHandler('json');
-conifer.getFileHandler('json'); // undefined
+conifer.handler.removeHandler('json');
+conifer.handler.getHandler('json'); // undefined
 ```
 
 

@@ -2,7 +2,6 @@
 # Dependencies
 {assert} = require 'chai'
 {ArgumentError, ArgumentMissingError, ArgumentTypeError, BadConstructionError} = require 'er'
-fs = require 'fs'
 {spy} = require 'sinon'
 
 

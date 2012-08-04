@@ -1,9 +1,6 @@
 
 # Dependencies
-CSON = require 'cson'
 {BadConstructionError} = require 'er'
-fs = require 'fs'
-path = require 'path'
 {verifyArg, verifyConstruction} = require './util'
 
 

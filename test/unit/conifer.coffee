@@ -23,17 +23,8 @@ suite 'conifer module', ->
   test 'should have an `Store` class', ->
     assert.isFunction conifer.Store
 
-  test 'should have a `removeFileHandler` function', ->
-    assert.isFunction conifer.removeFileHandler
-
-  test 'should have a `setFileHandler` function', ->
-    assert.isFunction conifer.setFileHandler
-
-  test 'should have a `getFileHandler` function', ->
-    assert.isFunction conifer.getFileHandler
-
-  test 'should have a `HandlerNotFoundError` class', ->
-    assert.isFunction conifer.HandlerNotFoundError
+  test 'should have a `handler` namespace', ->
+    assert.isObject conifer.handler
 
   test 'should have a `parse` function', ->
     assert.isFunction conifer.parse
@@ -44,198 +35,14 @@ suite 'conifer module', ->
 
   suite '`Store` class', ->
 
-    test 'should alias the Store class in the `store` module', ->
+    test 'should alias the `Store` class in the `store` module', ->
       assert.strictEqual conifer.Store, require('../../src/store').Store
 
 
-  suite '`removeFileHandler` function', ->
-
-    test 'should not throw when called with valid arguments', ->
-      assert.doesNotThrow ->
-        conifer.removeFileHandler 'foo'
-
-    test 'should throw when called with a non-string `fileExtension` argument', ->
-      assert.throws ->
-        conifer.removeFileHandler {}
-      , ArgumentTypeError
-
-    test 'should throw when called with an empty string `fileExtension` argument', ->
-      assert.throws ->
-        conifer.removeFileHandler ''
-      , ArgumentError
-
-
-  suite '`setFileHandler` function', ->
-
-    test 'should not throw when called with valid arguments', ->
-      assert.doesNotThrow ->
-        conifer.setFileHandler 'foo', ->
-
-    test 'should throw when called with a non-string `fileExtension` argument', ->
-      assert.throws ->
-        conifer.setFileHandler {}, ->
-      , ArgumentTypeError
-
-    test 'should throw when called with an empty string `fileExtension` argument', ->
-      assert.throws ->
-        conifer.setFileHandler '', ->
-      , ArgumentError
-
-    test 'should throw when called with a non-function `callback` argument', ->
-      assert.throws ->
-        conifer.setFileHandler 'foo', {}
-      , ArgumentTypeError
-
-
-  suite '`getFileHandler` function', ->
-
-    test 'should not throw when called with valid arguments', ->
-      assert.doesNotThrow ->
-        conifer.getFileHandler 'foo'
-
-    test 'should throw when called with a non-string `fileExtension` argument', ->
-      assert.throws ->
-        conifer.getFileHandler {}
-      , ArgumentTypeError
-
-    test 'should throw when called with an empty string `fileExtension` argument', ->
-      assert.throws ->
-        conifer.getFileHandler ''
-      , ArgumentError
-
-
-  suite '`HandlerNotFoundError` class', ->
-
-    suite 'instance with no message set', ->
-      instance = null
-
-      setup ->
-        instance = new conifer.HandlerNotFoundError
-
-      teardown ->
-        instance = null
-
-      test "should extend Error", ->
-        assert.instanceOf instance, Error
-
-      test 'message property should be a string', ->
-        assert.isString instance.message
-
-      test 'message property should be an unempty string', ->
-        assert.notStrictEqual instance.message, ''
-
-    suite 'instance with a message set', ->
-      instance = null
-
-      setup ->
-        instance = new conifer.HandlerNotFoundError 'foo'
-
-      teardown ->
-        instance = null
-
-      test 'message property should be a string', ->
-        assert.isString instance.message
-
-      test 'message property should be equal to the message argument passed into the constructor', ->
-        assert.strictEqual instance.message, 'foo'
-
-
-  suite 'File handlers', ->
-    fileExtension = 'foo'
-    fileHandler = -> 'baz'
-
-    teardown ->
-      conifer.removeFileHandler fileExtension
-
-    suite 'File handler added', ->
-
-      setup ->
-        conifer.setFileHandler fileExtension, fileHandler
-
-      test '`getFileHandler` should return the requested handler if present', ->
-        assert.strictEqual conifer.getFileHandler(fileExtension), fileHandler
-
-      test '`getFileHandler` should return the requested handler regardless of the case of the file extension', ->
-        assert.strictEqual conifer.getFileHandler(fileExtension.toUpperCase()), fileHandler
-
-      test '`getFileHandler` should return `undefined` if the requested handler isn\'t present', ->
-        assert.isUndefined conifer.getFileHandler('bar')
-
-    suite 'File handler added then overwritten', ->
-      fileHandlerOverride = -> 'qux'
-
-      setup ->
-        conifer.setFileHandler fileExtension, fileHandler
-        conifer.setFileHandler fileExtension, fileHandlerOverride
-
-      test '`getFileHandler` should return the override handler', ->
-        assert.strictEqual conifer.getFileHandler(fileExtension), fileHandlerOverride
-
-    suite 'File handler added then removed', ->
-
-      setup ->
-        conifer.setFileHandler fileExtension, fileHandler
-        conifer.removeFileHandler fileExtension
-
-      test '`getFileHandler` should return `undefined` when the handler is requested', ->
-        assert.isUndefined conifer.getFileHandler(fileExtension)
-
-
-  suite 'Default file handlers', ->
-
-    test '\'cson\' handler should be registered', ->
-      assert.isFunction conifer.getFileHandler('cson')
-
-    test '\'json\' handler should be registered', ->
-      assert.isFunction conifer.getFileHandler('json')
-
-    suite '\'cson\' handler', ->
-      handler = conifer.getFileHandler 'cson'
-
-      test 'should not throw when called with valid arguments', ->
-        assert.doesNotThrow ->
-          handler '{}'
-
-      test 'should throw when called with a non-string `fileContent` argument', ->
-        assert.throws ->
-          handler {}
-        , ArgumentTypeError
-
-      test 'should not throw when called with an empty string `fileContent` argument', ->
-        assert.doesNotThrow ->
-          handler ''
-
-      test 'should throw when called with an invalid CSON string `fileContent` argument', ->
-        assert.throws ->
-          handler '{hello:}'
-        , SyntaxError
-
-      test 'should return the expected parsed object when called with a valid CSON string', ->
-        assert.deepEqual handler('foo: "bar", bar: true'), {foo: 'bar', bar: true}
-
-    suite '\'json\' handler', ->
-      handler = conifer.getFileHandler 'json'
-
-      test 'should not throw when called with valid arguments', ->
-        assert.doesNotThrow ->
-          handler '{}'
-
-      test 'should throw when called with a non-string `fileContent` argument', ->
-        assert.throws ->
-          handler {}
-        , ArgumentTypeError
-
-      test 'should not throw when called with an empty string `fileContent` argument', ->
-        assert.doesNotThrow ->
-          handler ''
-
-      test 'should throw when called with an invalid JSON string `fileContent` argument', ->
-        assert.throws ->
-          handler '{hello:}'
-        , SyntaxError
-
-      test 'should return the expected parsed object when called with a valid JSON string', ->
-        assert.deepEqual handler('{"foo": "bar", "bar": true}'), {foo: 'bar', bar: true}
+  suite '`handler` namespace', ->
+    
+    test 'should alias the `handler` module', ->
+      assert.strictEqual conifer.handler, require('../../src/handler')
 
 
   suite '`parse` function', ->
@@ -282,13 +89,13 @@ suite 'conifer module', ->
         callback = spy (cbStore, cbError) ->
           store = cbStore
           done()
-        oldHandler = conifer.getFileHandler 'json'
+        oldHandler = conifer.handler.getHandler 'json'
         handler = spy(oldHandler)
-        conifer.setFileHandler 'json', handler
+        conifer.handler.setHandler 'json', handler
         conifer.parse fixtureFile.file001, callback
 
       teardown ->
-        conifer.setFileHandler 'json', oldHandler
+        conifer.handler.setHandler 'json', oldHandler
 
       test 'should call the callback', ->
         assert.isTrue callback.called
@@ -339,7 +146,7 @@ suite 'conifer module', ->
         assert.isNull callback.getCall(0).args[0]
 
       test 'should call the callback with a `HandlerNotFoundError` error second argument', ->
-        assert.instanceOf callback.getCall(0).args[1], conifer.HandlerNotFoundError
+        assert.instanceOf callback.getCall(0).args[1], conifer.handler.HandlerNotFoundError
 
 
   suite '`parseSync` function', ->
@@ -371,19 +178,19 @@ suite 'conifer module', ->
     test 'should throw when called with a `filePath` argument which resolves to a file which has no handler registered', ->
       assert.throws ->
         conifer.parseSync fixtureFile.file003
-      , conifer.HandlerNotFoundError
+      , conifer.handler.HandlerNotFoundError
     
     suite 'call with a `filePath` argument which resolves to a valid JSON file', ->
       handler = oldHandler = store = null
 
       setup ->
-        oldHandler = conifer.getFileHandler 'json'
+        oldHandler = conifer.handler.getHandler 'json'
         handler = spy(oldHandler)
-        conifer.setFileHandler 'json', handler
+        conifer.handler.setHandler 'json', handler
         store = conifer.parseSync fixtureFile.file001
 
       teardown ->
-        conifer.setFileHandler 'json', oldHandler
+        conifer.handler.setHandler 'json', oldHandler
 
       test 'should call the expected handler', ->
         assert.isTrue handler.called
