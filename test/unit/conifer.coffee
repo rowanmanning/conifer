@@ -154,6 +154,120 @@ suite 'conifer module', ->
       test 'should call the callback with a `HandlerNotFoundError` error second argument', ->
         assert.instanceOf callback.getCall(0).args[1], conifer.handler.HandlerNotFoundError
 
+    suite 'call with a `filePath` argument which has valid import merge properties', ->
+      callback = handler = oldHandler = store = null
+
+      setup (done) ->
+        callback = spy (cbStore, cbError) ->
+          store = cbStore
+          done()
+        oldHandler = conifer.handler.getHandler 'json'
+        handler = spy(oldHandler)
+        conifer.handler.setHandler 'json', handler
+        conifer.parse fixtureFile.file004, callback
+
+      teardown ->
+        conifer.handler.setHandler 'json', oldHandler
+
+      test 'should call the expected handler for each file parsed', ->
+        assert.strictEqual handler.callCount, 4
+
+      test 'should call the handler with the contents of each imported file', ->
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.file004, 'utf8'))
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.import001, 'utf8'))
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.import002, 'utf8'))
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.import001, 'utf8'))
+
+      test 'Store in callback should not have the import merge properties defined', ->
+        assert.isUndefined store.get('<<')
+        assert.isUndefined store.get('nest')['<<']
+
+      test 'Store in callback should have the expected configurations set', ->
+        assert.strictEqual store.get('foo'), 'bar'
+        assert.strictEqual store.get('bar'), 'baz'
+        assert.strictEqual store.get('baz'), 'qux'
+        assert.strictEqual store.get('nest').bar, 'baz'
+
+    suite 'call with a `filePath` argument which has invalid import merge properties', ->
+      callback = handler = oldHandler = store = null
+
+      setup (done) ->
+        callback = spy (cbStore, cbError) ->
+          store = cbStore
+          done()
+        oldHandler = conifer.handler.getHandler 'json'
+        handler = spy(oldHandler)
+        conifer.handler.setHandler 'json', handler
+        conifer.parse fixtureFile.file005, callback
+
+      teardown ->
+        conifer.handler.setHandler 'json', oldHandler
+
+      test 'should call the expected handler only once', ->
+        assert.strictEqual handler.callCount, 1
+
+      test 'returned Store should have the invalid import merge properties still defined', ->
+        assert.isDefined store.get('<<')
+        assert.isDefined store.get('nest')['<<']
+        assert.isDefined store.get('nest2')['<<']
+
+      test 'returned Store should have the expected configurations set', ->
+        assert.strictEqual store.get('foo'), 'bar'
+        assert.isUndefined store.get('bar')
+        assert.isUndefined store.get('baz')
+        assert.isUndefined store.get('nest').bar
+
+    suite 'call with a `filePath` argument which has valid import properties', ->
+      callback = handler = oldHandler = store = null
+
+      setup (done) ->
+        callback = spy (cbStore, cbError) ->
+          store = cbStore
+          done()
+        oldHandler = conifer.handler.getHandler 'json'
+        handler = spy(oldHandler)
+        conifer.handler.setHandler 'json', handler
+        conifer.parse fixtureFile.file006, callback
+
+      teardown ->
+        conifer.handler.setHandler 'json', oldHandler
+
+      test 'should call the expected handler for each file parsed', ->
+        assert.strictEqual handler.callCount, 3
+
+      test 'should call the handler with the contents of each imported file', ->
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.file006, 'utf8'))
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.import001, 'utf8'))
+        assert.isTrue handler.calledWith(fs.readFileSync(fixtureFile.import002, 'utf8'))
+
+      test 'returned Store should have the expected configurations set', ->
+        assert.strictEqual store.get('foo'), 'bar'
+        assert.strictEqual store.get('bar').bar, 'baz'
+        assert.strictEqual store.get('nest').foo.baz, 'qux'
+
+    suite 'call with a `filePath` argument which has invalid import properties', ->
+      callback = handler = oldHandler = store = null
+
+      setup (done) ->
+        callback = spy (cbStore, cbError) ->
+          store = cbStore
+          done()
+        oldHandler = conifer.handler.getHandler 'json'
+        handler = spy(oldHandler)
+        conifer.handler.setHandler 'json', handler
+        conifer.parse fixtureFile.file007, callback
+
+      teardown ->
+        conifer.handler.setHandler 'json', oldHandler
+
+      test 'should call the expected handler only once', ->
+        assert.strictEqual handler.callCount, 1
+
+      test 'returned Store should have the expected configurations set', ->
+        assert.strictEqual store.get('foo'), 'bar'
+        assert.strictEqual store.get('bar'), '<<./import/import.001.json'
+        assert.strictEqual store.get('nest').foo, '  <<  ./import/import.002.json'
+
 
   suite '`parseSync` function', ->
 

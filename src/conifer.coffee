@@ -20,12 +20,11 @@ conifer.handler = handler
 
 
 # Config parser
-conifer.parse = (filePath, callback) ->
+parse = (filePath, callback, returnStore) ->
   verifyArg.isUnemptyString 'filePath', filePath
   verifyArg.isFunction 'callback', callback
 
   # Vars
-  fileContent = null
   handler = null
 
   # Parse
@@ -43,24 +42,34 @@ conifer.parse = (filePath, callback) ->
     (done) ->
       try
         handler = getFileHandlerForPath filePath
-        done()
+        done(null, handler)
       catch error
         done error
 
     # Parse step 3: Read file
-    (done) ->
-      fs.readFile filePath, 'utf8', (error, content) ->
+    (handler, done) ->
+      fs.readFile filePath, 'utf8', (error, fileContent) ->
         if error?
           done newFileReadError(filePath)
         else
-          fileContent = content
-          done()
+          done null, handler, fileContent
 
     # Parse step 4: parse content
-    (done) ->
+    (handler, fileContent, done) ->
       try
-        parsedContent = handler fileContent
-        done null, new conifer.Store(parsedContent)
+        done null, handler(fileContent)
+      catch error
+        done error
+
+    # Parse step 5: Run imports
+    (parsedContent, done) ->
+      try
+        queue = async.queue ((task, taskDone) -> task taskDone, done), 3
+        queue.drain = ->
+          done null, parsedContent
+        parseObjectImports parsedContent, path.dirname(filePath), queue
+        queue.push (taskDone, parseDone) ->
+          taskDone()
       catch error
         done error
 
@@ -69,8 +78,53 @@ conifer.parse = (filePath, callback) ->
   (error, result) ->
     if error
       callback null, error
+    else if returnStore
+      callback new conifer.Store(result), null
     else
       callback result, null
+
+# Parse object imports
+parseObjectImports = (object, importBasePath, queue) ->
+  for own property, value of object
+    do (property, value) ->
+
+      # Import merge
+      if propertyIsImportMerge property, value
+        for importFilePath in value
+          do (importFilePath) ->
+            importFilePath = path.resolve importBasePath + '/' + importFilePath
+            queue.push (taskDone, parseDone) ->
+              parse importFilePath, (importContent, error) ->
+                if error
+                  parseDone error
+                else
+                  util.mergeObjects object, importContent
+                  taskDone()
+              , false
+
+      # Import property
+      else if valueIsImportProperty value
+        importFilePath = path.resolve importBasePath + '/' + cleanImportString(value)
+        queue.push (taskDone, parseDone) ->
+          parse importFilePath, (importContent, error) ->
+            if error
+              parseDone error
+            else
+              object[property] = importContent
+              taskDone()
+          , false
+
+      # Nested object
+      else if typeof value is 'object'
+        parseObjectImports value, importBasePath, queue
+
+  # Cleanup
+  removeImportMergeProperties object
+
+
+# Exposed config parser (prevent access to the `returnStore` argument)
+conifer.parse = (filePath, callback) ->
+  parse filePath, callback, true
 
 
 # Synchronous config parser
