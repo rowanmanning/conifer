@@ -32,24 +32,21 @@ conifer.parse = (filePath, callback) ->
     deferred = q.defer()
     fs.stat filePath, (error, stats) ->
       if error? or not stats.isFile()
-        deferred.reject new FileNotFoundError("Config file at #{filePath} was not found, or is not a file")
+        deferred.reject helper.newFileNotFoundError(filePath)
       else
         deferred.resolve()
     deferred.promise
 
   # Parse step 2: Check that the required handler is present
   .then ->
-    fileExtension = util.path.getFileExtension filePath
-    handler = conifer.handler.getHandler fileExtension
-    if not handler?
-      throw new conifer.handler.HandlerNotFoundError "Handler for '#{fileExtension}' was not found"
+    handler = helper.getFileHandlerForPath filePath
 
   # Parse step 3: Read file
   .then ->
     deferred = q.defer()
     fs.readFile filePath, 'utf8', (error, content) ->
       if error?
-        deferred.reject new IOError("Config file at #{filePath} could not be read")
+        deferred.reject helper.newFileReadError filePath
       else
         fileContent = content
         deferred.resolve()
@@ -57,8 +54,7 @@ conifer.parse = (filePath, callback) ->
 
   # Parse step 4: parse content
   .then ->
-    parsedContent = handler fileContent
-    callback new conifer.Store(parsedContent), null
+    callback helper.createStoreFromContent(fileContent, handler), null
 
   # Parse failure
   .fail (error) ->
@@ -70,26 +66,50 @@ conifer.parseSync = (filePath) ->
   verifyArg.isUnemptyString 'filePath', filePath
 
   # Parse step 1: Check that file exists
-  fileError = new FileNotFoundError "Config file at #{filePath} was not found, or is not a file"
   try
     stats = fs.statSync filePath
     throw new Error() if not stats.isFile()
   catch error
-    throw fileError
+    throw helper.newFileNotFoundError filePath
 
   # Parse step 2: Check that the required handler is present
-  fileExtension = util.path.getFileExtension filePath
-  handler = conifer.handler.getHandler fileExtension
-  if not handler?
-    throw new conifer.handler.HandlerNotFoundError "Handler for '#{fileExtension}' was not found"
+  handler = helper.getFileHandlerForPath filePath
 
   # Parse step 3: Read file
   fileContent = null
   try
     fileContent = fs.readFileSync filePath, 'utf8'
   catch error
-    throw new IOError "Config file at #{filePath} could not be read"
+    throw helper.newFileReadError filePath
 
   # Parse step 4: parse content
-  parsedContent = handler fileContent
-  new conifer.Store parsedContent
+  return helper.createStoreFromContent fileContent, handler
+
+
+# Helper functions to reduce repetition in parse and parseSync
+helper =
+
+  # Create a new file not found error
+  newFileNotFoundError: (filePath) ->
+    new FileNotFoundError "Config file at #{filePath} was not found, or is not a file"
+
+  # Create a new handler not found error
+  newHandlerNotFoundError: (fileExtension) ->
+    new conifer.handler.HandlerNotFoundError "Handler for '#{fileExtension}' was not found"
+
+  # Create a new file read error
+  newFileReadError: (filePath) ->
+    new IOError "Config file at #{filePath} could not be read"
+
+  # Get (and validate) the handler for a file path
+  getFileHandlerForPath: (filePath) ->
+    fileExtension = util.path.getFileExtension filePath
+    handler = conifer.handler.getHandler fileExtension
+    if not handler?
+      throw helper.newHandlerNotFoundError fileExtension
+    return handler
+
+  # Create a Store from file content and a handler function
+  createStoreFromContent: (fileContent, handler) ->
+    parsedContent = handler fileContent
+    new conifer.Store parsedContent
