@@ -1,0 +1,18 @@
+{
+    "foo": "bar",
+    "<<": {
+        "1": "./import/import.001.json",
+        "2": "./import/import.002.json"
+    },
+    "nest": {
+        "<<": "./import/import.001.json"
+    },
+    "nest2": {
+        "<<": [
+            1,
+            "./import/import.001.json",
+            2,
+            3
+        ]
+    }
+}

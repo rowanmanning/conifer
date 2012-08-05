@@ -20,6 +20,9 @@ suite 'util module', ->
 
   test 'should have a `path` namespace', ->
     assert.isObject util.path
+
+  test 'should have a `mergeObjects` function', ->
+    assert.isFunction util.mergeObjects
   
 
   suite '`verifyArg` namespace', ->
@@ -151,3 +154,30 @@ suite 'util module', ->
         assert.strictEqual path.getFileExtension('hello..html'), 'html'
         assert.strictEqual path.getFileExtension('hello.html.mustache'), 'mustache'
         assert.strictEqual path.getFileExtension('path/to/hello.html'), 'html'
+
+
+  suite '`mergeObjects` function', ->
+
+    test 'should not throw when called with two objects', ->
+      assert.doesNotThrow ->
+        util.mergeObjects {}, {}
+
+    test 'should throw when called with a non-object first argument', ->
+      assert.throws ->
+        util.mergeObjects 'foo', {}
+      , ArgumentTypeError
+
+    test 'should throw when called with a non-object second argument', ->
+      assert.throws ->
+        util.mergeObjects {}, 'foo'
+      , ArgumentTypeError
+
+    test 'should return the first passed in object when called', ->
+      object1 = {}
+      assert.strictEqual util.mergeObjects(object1, {foo: 'bar'}), object1
+
+    test 'should modify the first passed in object as expected when called', ->
+      assert.deepEqual util.mergeObjects({foo: 'bar'}, {}), {foo: 'bar'}
+      assert.deepEqual util.mergeObjects({}, {foo: 'bar'}), {foo: 'bar'}
+      assert.deepEqual util.mergeObjects({foo: 'bar'}, {bar: 'baz'}), {foo: 'bar', bar: 'baz'}
+      assert.deepEqual util.mergeObjects({foo: 'bar'}, {foo: 'baz'}), {foo: 'baz'}

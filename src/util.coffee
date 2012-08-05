@@ -41,3 +41,12 @@ exports.path =
   getFileExtension: (filePath) ->
     exports.verifyArg.isString 'filePath', filePath
     path.extname(filePath).replace /^\./, ''
+
+
+# Merge objects
+exports.mergeObjects = (object1, object2) ->
+  exports.verifyArg.isObject 'object1', object1
+  exports.verifyArg.isObject 'object2', object2
+  for own property, value of object2
+    object1[property] = value
+  object1
