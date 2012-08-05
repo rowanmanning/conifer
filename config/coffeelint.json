@@ -8,7 +8,7 @@
     "no_trailing_semicolons": {"level": "error"},
     "no_plusplus":            {"level": "ignore"},
     "no_throwing_strings":    {"level": "error"},
-    "cyclomatic_complexity":  {"level": "warn", "value": 6},
+    "cyclomatic_complexity":  {"level": "warn", "value": 7},
     "line_endings":           {"level": "error", "value": "unix"},
     "no_implicit_parens":     {"level": "ignore"}
 }

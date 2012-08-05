@@ -23,10 +23,10 @@
     },
 
     "dependencies": {
+        "async": "0.1.x",
         "cson": "1.2.x",
         "er": "0.2.x",
-        "js-yaml": "1.0.x",
-        "q": "0.8.x"
+        "js-yaml": "1.0.x"
     },
     "devDependencies": {
         "chai": "1.1.x",

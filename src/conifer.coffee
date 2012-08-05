@@ -1,10 +1,10 @@
 
 # Dependencies
+async = require 'async'
 {FileNotFoundError, IOError} = require 'er'
 fs = require 'fs'
 handler = require './handler'
 path = require 'path'
-q = require 'q'
 {Store} = require './store'
 util = require './util'
 verifyArg = util.verifyArg
@@ -28,39 +28,49 @@ conifer.parse = (filePath, callback) ->
   fileContent = null
   handler = null
 
-  # Parse step 1: Check that file exists
-  q.fcall ->
-    deferred = q.defer()
-    fs.stat filePath, (error, stats) ->
-      if error? or not stats.isFile()
-        deferred.reject newFileNotFoundError(filePath)
-      else
-        deferred.resolve()
-    deferred.promise
+  # Parse
+  async.waterfall [
 
-  # Parse step 2: Check that the required handler is present
-  .then ->
-    handler = getFileHandlerForPath filePath
+    # Parse step 1: Check that file exists
+    (done) ->
+      fs.stat filePath, (error, stats) ->
+        if error? or not stats.isFile()
+          done newFileNotFoundError(filePath)
+        else
+          done()
 
-  # Parse step 3: Read file
-  .then ->
-    deferred = q.defer()
-    fs.readFile filePath, 'utf8', (error, content) ->
-      if error?
-        deferred.reject newFileReadError filePath
-      else
-        fileContent = content
-        deferred.resolve()
-    deferred.promise
+    # Parse step 2: Check that the required handler is present
+    (done) ->
+      try
+        handler = getFileHandlerForPath filePath
+        done()
+      catch error
+        done error
 
-  # Parse step 4: parse content
-  .then ->
-    parsedContent = handler fileContent
-    callback new conifer.Store(parsedContent), null
+    # Parse step 3: Read file
+    (done) ->
+      fs.readFile filePath, 'utf8', (error, content) ->
+        if error?
+          done newFileReadError(filePath)
+        else
+          fileContent = content
+          done()
 
-  # Parse failure
-  .fail (error) ->
-    callback null, error
+    # Parse step 4: parse content
+    (done) ->
+      try
+        parsedContent = handler fileContent
+        done null, new conifer.Store(parsedContent)
+      catch error
+        done error
+
+  ],
+  # Trigger callback
+  (error, result) ->
+    if error
+      callback null, error
+    else
+      callback result, null
 
 
 # Synchronous config parser
@@ -118,7 +128,7 @@ parseObjectImportsSync = (object, importBasePath) ->
   # Cleanup
   removeImportMergeProperties object
 
-# Exposed synchronous config parser (prevent access to the `noStore` argument)
+# Exposed synchronous config parser (prevent access to the `returnStore` argument)
 conifer.parseSync = (filePath) ->
   parseSync filePath, true
 
