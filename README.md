@@ -110,6 +110,90 @@ config.get('foo'); // bar
 ```
 
 
+Configuration Importing
+-----------------------
+
+Your config files are able to import other configurations as
+properties, or by merging them into the current object. This
+allows for a single entry-point for your configuration, as well
+as a more managable and reusable set of config files.
+
+Examples below are mostly in JSON but this will work for all
+supported file types, as well as allowing for cross-file-type
+importing.
+
+### Import Properties
+
+Import properties allow you to import the contents of another
+config file into a property. They work on a property whose
+(string) value begins with `<< `. So if we have the following
+files:
+
+config/main.json:
+```json
+{
+    "name": "Hello World",
+    "routes": "<< ./routes.json"
+}
+```
+
+config/routes.json:
+```json
+{
+    "/": "controller/index",
+    "/about": "controller/about",
+}
+```
+
+Parsing `config/main.json` will result in the following
+structure:
+```json
+{
+    "name": "Hello World",
+    "routes": {
+        "/": "controller/index",
+        "/about": "controller/about",
+    }
+}
+```
+
+### Import Merges
+
+Import merges allow you to merge the contents of another config
+file into the current object. Merges are indicated by the `<<`
+property of an object, which should be set to an array of file
+names. If we have the following files:
+
+config/main.json:
+```json
+{
+    "name": "Hello World",
+    "outputErrors": true,
+    "<<": [
+        "./production.json"
+    ]
+}
+```
+
+config/production.json:
+```json
+{
+    "outputErrors": false,
+    "logErrors": true
+}
+```
+
+Parsing `config/main.json` will result in the following
+structure:
+```json
+{
+    "name": "Hello World",
+    "outputErrors": false,
+    "logErrors": true
+}
+```
+
+
 Extending With File Handlers
 ----------------------------
 
