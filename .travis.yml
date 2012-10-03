@@ -7,7 +7,7 @@ node_js:
  - 0.6
 
 # Build script
-script: './node_modules/.bin/jake -f ./jakefile.coffee ci'
+script: './node_modules/.bin/jake ci'
 
 # Branch whitelist
 branches:
