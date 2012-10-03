@@ -5,7 +5,7 @@ colors = require 'colors'
 
 # Paths
 paths =
-  config: './config'
+  config: './test/config'
   lib: './lib'
   nodebin: './node_modules/.bin'
   src: './src'
@@ -60,7 +60,7 @@ task 'default', ['build']
 # Generate a lint command
 getLintCommand = (options = {}) ->
   options.configFile ?= "#{paths.config}/coffeelint.json"
-  "#{paths.nodebin}/coffeelint -f #{options.configFile} #{paths.src}/** #{paths.unitTest}/**";
+  "#{paths.nodebin}/coffeelint -rf #{options.configFile} #{paths.src} #{paths.unitTest}"
 
 # Generate a test command
 getTestCommand = (options = {}) ->
