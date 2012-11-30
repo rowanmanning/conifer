@@ -77,11 +77,11 @@ parse = (filePath, callback, returnStore) ->
   # Trigger callback
   (error, result) ->
     if error
-      callback null, error
+      callback error, null
     else if returnStore
-      callback new conifer.Store(result), null
+      callback null, new conifer.Store(result)
     else
-      callback result, null
+      callback null, result
 
 # Parse object imports
 parseObjectImports = (object, importBasePath, queue) ->
@@ -94,7 +94,7 @@ parseObjectImports = (object, importBasePath, queue) ->
           do (importFilePath) ->
             importFilePath = path.resolve importBasePath + '/' + importFilePath
             queue.push (taskDone, parseDone) ->
-              parse importFilePath, (importContent, error) ->
+              parse importFilePath, (error, importContent) ->
                 if error
                   parseDone error
                 else
@@ -106,7 +106,7 @@ parseObjectImports = (object, importBasePath, queue) ->
       else if valueIsImportProperty value
         importFilePath = path.resolve importBasePath + '/' + cleanImportString(value)
         queue.push (taskDone, parseDone) ->
-          parse importFilePath, (importContent, error) ->
+          parse importFilePath, (error, importContent) ->
             if error
               parseDone error
             else

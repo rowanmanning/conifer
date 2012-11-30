@@ -49,11 +49,10 @@ Conifer as above.
 This function parses a config file asynchronously. It accepts
 two arguments – a file path and a callback function. The file
 path must be an unempty string and the callback should accept
-two arguments itself: the parsed config store, and an error
-object.
+two arguments itself: an error object and the parsed config store.
 
 ```js
-conifer.parse('example.json', function (store, err) {
+conifer.parse('example.json', function (err, store) {
     if (err !== null) {
         throw err;
     }
@@ -61,9 +60,9 @@ conifer.parse('example.json', function (store, err) {
 });
 ```
 
-In the callback, `store` will be either a
+In the callback, `err` will be `null` on success, or an Error
+object on failure. `store` will be either a
 [`conifer.Store`](#coniferstore) instance on success or `null`.
-`err` will be `null` on success, or an Error object on failure.
 
 ---
 

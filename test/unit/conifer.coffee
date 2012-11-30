@@ -26,7 +26,7 @@ suite 'conifer module', ->
   test 'should be an object', ->
     assert.isObject conifer
 
-  test 'should have an `Store` class', ->
+  test 'should have a `Store` class', ->
     assert.isFunction conifer.Store
 
   test 'should have a `handler` namespace', ->
@@ -82,17 +82,17 @@ suite 'conifer module', ->
       test 'should call the callback', ->
         assert.isTrue callback.called
 
-      test 'should call the callback with a `null` first argument', ->
-        assert.isNull callback.getCall(0).args[0]
+      test 'should call the callback with a `FileNotFoundError` first argument', ->
+        assert.instanceOf callback.getCall(0).args[0], FileNotFoundError
 
-      test 'should call the callback with a `FileNotFoundError` second argument', ->
-        assert.instanceOf callback.getCall(0).args[1], FileNotFoundError
+      test 'should call the callback with a `null` second argument', ->
+        assert.isNull callback.getCall(0).args[1]
 
     suite 'call with a `filePath` argument which resolves to a valid JSON file', ->
       callback = handler = oldHandler = store = null
 
       setup (done) ->
-        callback = spy (cbStore, cbError) ->
+        callback = spy (cbError, cbStore) ->
           store = cbStore
           done()
         oldHandler = conifer.handler.getHandler 'json'
@@ -106,11 +106,11 @@ suite 'conifer module', ->
       test 'should call the callback', ->
         assert.isTrue callback.called
 
-      test 'should call the callback with a `Store` instance first argument', ->
-        assert.instanceOf callback.getCall(0).args[0], conifer.Store
+      test 'should call the callback with a `null` first argument', ->
+        assert.isNull callback.getCall(0).args[0]
 
-      test 'should call the callback with a `null` second argument', ->
-        assert.isNull callback.getCall(0).args[1]
+      test 'should call the callback with a `Store` instance second argument', ->
+        assert.instanceOf callback.getCall(0).args[1], conifer.Store
 
       test 'should call the expected handler', ->
         assert.isTrue handler.called
@@ -132,11 +132,11 @@ suite 'conifer module', ->
       test 'should call the callback', ->
         assert.isTrue callback.called
 
-      test 'should call the callback with a `null` first argument', ->
-        assert.isNull callback.getCall(0).args[0]
+      test 'should call the callback with a `SyntaxError` first argument', ->
+        assert.instanceOf callback.getCall(0).args[0], SyntaxError
 
-      test 'should call the callback with a `SyntaxError` second argument', ->
-        assert.instanceOf callback.getCall(0).args[1], SyntaxError
+      test 'should call the callback with a `null` second argument', ->
+        assert.isNull callback.getCall(0).args[1]
 
     suite 'call with a `filePath` argument which resolves to a file which has no handler registered', ->
       callback = null
@@ -148,17 +148,17 @@ suite 'conifer module', ->
       test 'should call the callback', ->
         assert.isTrue callback.called
 
-      test 'should call the callback with a `null` first argument', ->
-        assert.isNull callback.getCall(0).args[0]
+      test 'should call the callback with a `HandlerNotFoundError` error first argument', ->
+        assert.instanceOf callback.getCall(0).args[0], conifer.handler.HandlerNotFoundError
 
-      test 'should call the callback with a `HandlerNotFoundError` error second argument', ->
-        assert.instanceOf callback.getCall(0).args[1], conifer.handler.HandlerNotFoundError
+      test 'should call the callback with a `null` second argument', ->
+        assert.isNull callback.getCall(0).args[1]
 
     suite 'call with a `filePath` argument which has valid import merge properties', ->
       callback = handler = oldHandler = store = null
 
       setup (done) ->
-        callback = spy (cbStore, cbError) ->
+        callback = spy (cbError, cbStore) ->
           store = cbStore
           done()
         oldHandler = conifer.handler.getHandler 'json'
@@ -192,7 +192,7 @@ suite 'conifer module', ->
       callback = handler = oldHandler = store = null
 
       setup (done) ->
-        callback = spy (cbStore, cbError) ->
+        callback = spy (cbError, cbStore) ->
           store = cbStore
           done()
         oldHandler = conifer.handler.getHandler 'json'
@@ -221,7 +221,7 @@ suite 'conifer module', ->
       callback = handler = oldHandler = store = null
 
       setup (done) ->
-        callback = spy (cbStore, cbError) ->
+        callback = spy (cbError, cbStore) ->
           store = cbStore
           done()
         oldHandler = conifer.handler.getHandler 'json'
@@ -249,7 +249,7 @@ suite 'conifer module', ->
       callback = handler = oldHandler = store = null
 
       setup (done) ->
-        callback = spy (cbStore, cbError) ->
+        callback = spy (cbError, cbStore) ->
           store = cbStore
           done()
         oldHandler = conifer.handler.getHandler 'json'
