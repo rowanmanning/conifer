@@ -5,7 +5,6 @@ async = require 'async'
 fs = require 'fs'
 handler = require './handler'
 path = require 'path'
-{Store} = require './store'
 util = require './util'
 verifyArg = util.verifyArg
 
@@ -15,12 +14,11 @@ module.exports = conifer = {}
 
 
 # Module aliases
-conifer.Store = Store
 conifer.handler = handler
 
 
 # Config parser
-parse = (filePath, callback, returnStore) ->
+conifer.parse = (filePath, callback) ->
   verifyArg.isUnemptyString 'filePath', filePath
   verifyArg.isFunction 'callback', callback
 
@@ -75,13 +73,11 @@ parse = (filePath, callback, returnStore) ->
 
   ],
   # Trigger callback
-  (error, result) ->
+  (error, config) ->
     if error
       callback error, null
-    else if returnStore
-      callback null, new conifer.Store(result)
     else
-      callback null, result
+      callback null, config
 
 # Parse object imports
 parseObjectImports = (object, importBasePath, queue) ->
@@ -94,7 +90,7 @@ parseObjectImports = (object, importBasePath, queue) ->
           do (importFilePath) ->
             importFilePath = path.resolve importBasePath + '/' + importFilePath
             queue.push (taskDone, parseDone) ->
-              parse importFilePath, (error, importContent) ->
+              conifer.parse importFilePath, (error, importContent) ->
                 if error
                   parseDone error
                 else
@@ -106,7 +102,7 @@ parseObjectImports = (object, importBasePath, queue) ->
       else if valueIsImportProperty value
         importFilePath = path.resolve importBasePath + '/' + cleanImportString(value)
         queue.push (taskDone, parseDone) ->
-          parse importFilePath, (error, importContent) ->
+          conifer.parse importFilePath, (error, importContent) ->
             if error
               parseDone error
             else
@@ -122,13 +118,8 @@ parseObjectImports = (object, importBasePath, queue) ->
   removeImportMergeProperties object
 
 
-# Exposed config parser (prevent access to the `returnStore` argument)
-conifer.parse = (filePath, callback) ->
-  parse filePath, callback, true
-
-
 # Synchronous config parser
-parseSync = (filePath, returnStore) ->
+conifer.parseSync = (filePath) ->
   verifyArg.isUnemptyString 'filePath', filePath
 
   # Parse step 1: Check that file exists
@@ -149,16 +140,13 @@ parseSync = (filePath, returnStore) ->
     throw newFileReadError filePath
 
   # Parse step 4: Parse content
-  parsedContent = handler fileContent
+  config = handler fileContent
 
   # Parse step 5: Run imports
-  parseObjectImportsSync parsedContent, path.dirname(filePath)
+  parseObjectImportsSync config, path.dirname(filePath)
 
   # Return
-  if returnStore
-    new conifer.Store parsedContent
-  else
-    parsedContent
+  config
 
 # Parse object imports synchronously
 parseObjectImportsSync = (object, importBasePath) ->
@@ -168,12 +156,12 @@ parseObjectImportsSync = (object, importBasePath) ->
     if propertyIsImportMerge property, value
       for importFilePath in value
         importFilePath = path.resolve importBasePath + '/' + importFilePath
-        util.mergeObjects object, parseSync(importFilePath, false)
+        util.mergeObjects object, conifer.parseSync(importFilePath, false)
 
     # Import property
     else if valueIsImportProperty value
       importFilePath = path.resolve importBasePath + '/' + cleanImportString(value)
-      object[property] = parseSync importFilePath, false
+      object[property] = conifer.parseSync importFilePath, false
 
     # Nested object
     else if typeof value is 'object'
@@ -181,10 +169,6 @@ parseObjectImportsSync = (object, importBasePath) ->
 
   # Cleanup
   removeImportMergeProperties object
-
-# Exposed synchronous config parser (prevent access to the `returnStore` argument)
-conifer.parseSync = (filePath) ->
-  parseSync filePath, true
 
 
 # Create a new file not found error
