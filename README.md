@@ -4,7 +4,7 @@ Conifer
 
 A multi-format, file-based configuration library for Node. It streamlines reading and parsing configurations from [JSON][json], [CSON][cson] and [YAML][yaml] files, with support for adding your own file-type handlers.
 
-**Current Stable Version:** *0.3.0*  
+**Current Stable Version:** *1.0.0*  
 **Automated Build Status:** [![Build Status][travis-status]][travis]
 
 

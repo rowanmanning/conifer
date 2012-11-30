@@ -3,6 +3,14 @@ Conifer ChangeLog
 =================
 
 
+1.0.0 (2012-11-30)
+------------------
+
+* Switch callback argument order to match Node internals (see #1)
+* Remove Store class – deal with plain objects for config
+* Stable release
+
+
 0.3.0 (2012-08-06)
 ------------------
 
@@ -19,4 +27,4 @@ Conifer ChangeLog
 0.1.0 (2012-07-31)
 ------------------
 
-(Initial release)
+* Initial release
