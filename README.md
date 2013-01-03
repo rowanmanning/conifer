@@ -207,6 +207,6 @@ Conifer is licensed under the [MIT][mit] license.
 [cson]: https://github.com/bevry/cson
 [json]: http://www.json.org/
 [mit]: http://opensource.org/licenses/mit-license.php
-[travis]: https://secure.travis-ci.org/rowanmanning/conifer
-[travis-status]: https://secure.travis-ci.org/rowanmanning/conifer.png?branch=master
+[travis]: https://travis-ci.org/rowanmanning/conifer
+[travis-status]: https://travis-ci.org/rowanmanning/conifer.png?branch=master
 [yaml]: http://www.yaml.org/
