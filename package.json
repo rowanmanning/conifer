@@ -26,7 +26,7 @@
         "async": "0.1.x",
         "cson": "1.4.x",
         "er": "0.2.x",
-        "js-yaml": "1.0.x"
+        "js-yaml": "3.13.x"
     },
     "devDependencies": {
         "chai": "1.4.x",
